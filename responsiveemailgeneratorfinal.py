@@ -48,9 +48,15 @@ st.text('¿Quieres adjuntar algo?')
 yes2 = st.checkbox('Claro')
 if yes2:
 #filepath = st.text_input('Introduce la ruta del adjunto. Recuerda que no tenga tildes ni espacios en blanco:')
-    filepath = st.text_input(u'Introduce la ruta del adjunto:')
-    st.write(filepath)
+#    filepath = st.text_input(u'Introduce la ruta del adjunto:')
+#    st.write(filepath)
+    def file_selector(folder_path='.'):
+        filenames = os.listdir(folder_path)
+        selected_filename = st.selectbox('Selecciona el archivo que quieres adjuntar:', filenames)
+        return os.path.join(folder_path, selected_filename)
 
+    filepath = file_selector()
+    st.write('Has seleccionado %s' % filepath)
 nope2 = st.checkbox('Ahora no')
 if nope2:
     filepath =''

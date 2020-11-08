@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[3]:
 
 
 import streamlit as st
@@ -15,6 +15,7 @@ import os.path
 import datetime
 import requests
 import ssl
+from io import StringIO
 
 #import html 
 #Cabecera con estilo
@@ -47,20 +48,15 @@ subject = st.text_input('Introduce el asunto:')
 st.text('¿Quieres adjuntar algo?')
 yes2 = st.checkbox('Claro')
 if yes2:
-#filepath = st.text_input('Introduce la ruta del adjunto. Recuerda que no tenga tildes ni espacios en blanco:')
-#    filepath = st.text_input(u'Introduce la ruta del adjunto:')
-#    st.write(filepath)
-    def file_selector(folder_path='.'):
-        filenames = os.listdir(folder_path)
-        selected_filename = st.selectbox('Selecciona el archivo que quieres adjuntar:', filenames)
-        return os.path.join(folder_path, selected_filename)
-
-    filepath = file_selector()
-    st.write('Has seleccionado %s' % filepath)
+    file = st.file_uploader("Selecciona tu archivo:")
+    filenaming = os.path.basename(file.name)
+    
+        
 nope2 = st.checkbox('Ahora no')
 if nope2:
-    filepath =''
-
+    file =''
+    filenaming= ''
+    
 st.text('¿Qué proveedor de correo usas?')
 gmail = st.checkbox('Gmail')
 if gmail:
@@ -95,13 +91,26 @@ def send_email(recipient_mail,
     msg['To'] = recipient_mail
     msg['Subject'] = subject
     msg.attach(MIMEText(texto, 'html'))
+    # Open PDF file in binary mode
+    if file != '':
+        with open(filenaming, "rb") as attachment:
+            # Add file as application/octet-stream
+            # Email client can usually download this automatically as attachment
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
+
+    # Encode file in ASCII characters to send by email    
+            encoders.encode_base64(part)
+
+    # Add header as key/value pair to attachment part
+            part.add_header(
+                "Content-Disposition",
+                "attachment", filename=filenaming),
     
-    if filepath != '':
-        with open(filepath, "rb") as f:
-            #attach = email.mime.application.MIMEApplication(f.read(),_subtype="pdf")
-            attach = MIMEApplication(f.read(),_subtype="pdf")
-            attach.add_header('Content-Disposition','attachment',filename=os.path.basename(filepath))
-            msg.attach(attach)
+
+    # Add attachment to message and convert message to string
+            msg.attach(part)
+            text = msg.as_string()
     
     try:
         server = smtplib.SMTP(smtp, port)
@@ -120,7 +129,7 @@ def send_email(recipient_mail,
 send_email(recipient_mail,
             subject,
             texto+'<div style="background-color:white; padding-bottom: 25px;font-size:smaller; color:DeepSkyBlue;text-align:center">Automated and developed via Python by Raúl Fernández</div>',
-            filepath)
+            filenaming)
 
 
 # In[ ]:

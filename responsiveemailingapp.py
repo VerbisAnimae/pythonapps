@@ -93,7 +93,7 @@ def send_email(recipient_mail,
     msg.attach(MIMEText(texto, 'html'))
     # Open PDF file in binary mode
     if file != '':
-        with open(filenaming, "rb") as attachment:
+        with open(file, "rb") as attachment:
             # Add file as application/octet-stream
             # Email client can usually download this automatically as attachment
             part = MIMEBase("application", "octet-stream")

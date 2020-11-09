@@ -50,10 +50,8 @@ yes2 = st.checkbox('Claro')
 if yes2:
     file = st.file_uploader("Selecciona tu archivo:")
     filenaming = os.path.basename(file.name)
-    with open(filenaming, 'w') as f: 
-        f.write(filenaming)
-    filepath=os.path.abspath(filenaming)
-    st.write(filepath)    
+    
+        
 nope2 = st.checkbox('Ahora no')
 if nope2:
     file =''
@@ -125,7 +123,6 @@ def send_email(recipient_mail,
         server.quit()
     except:
         st.write(f"SMPT server connection error")
-        st.write(smtplib.SMTPConnectError)
     return True
 
 
